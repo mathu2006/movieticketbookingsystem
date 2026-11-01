@@ -109,5 +109,84 @@
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MovieTicketBooking.Controllers.TheatresController",
+    "Method": "GetAll",
+    "RelativePath": "api/Theatres",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MovieTicketBooking.Controllers.TheatresController",
+    "Method": "Create",
+    "RelativePath": "api/Theatres",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "MovieTicketBooking.DTOs.Theatres.CreateTheatreRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MovieTicketBooking.Controllers.TheatresController",
+    "Method": "GetById",
+    "RelativePath": "api/Theatres/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MovieTicketBooking.Controllers.TheatresController",
+    "Method": "Update",
+    "RelativePath": "api/Theatres/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "MovieTicketBooking.DTOs.Theatres.UpdateTheatreRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MovieTicketBooking.Controllers.TheatresController",
+    "Method": "Delete",
+    "RelativePath": "api/Theatres/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]
