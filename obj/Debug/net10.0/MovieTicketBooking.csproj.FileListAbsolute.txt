@@ -211,4 +211,4 @@ C:\Users\mathu\source\repos\MovieTicketBooking\MovieTicketBooking\obj\Debug\net1
 C:\Users\mathu\source\repos\MovieTicketBooking\MovieTicketBooking\obj\Debug\net10.0\MovieTicketBooking.pdb
 C:\Users\mathu\source\repos\MovieTicketBooking\MovieTicketBooking\obj\Debug\net10.0\MovieTicketBooking.genruntimeconfig.cache
 C:\Users\mathu\source\repos\MovieTicketBooking\MovieTicketBooking\obj\Debug\net10.0\ref\MovieTicketBooking.dll
-C:\Users\mathu\source\repos\MovieTicketBooking\MovieTicketBooking\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
+C:\Users\mathu\source\repos\MovieTicketBooking\MovieTicketBooking\obj\Debug\net10.0\MovieTicketBooking.sourcelink.json
