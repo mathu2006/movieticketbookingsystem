@@ -1,6 +1,14 @@
+# Visual Studio files
 .vs/
-bin/
-obj/
 *.user
 *.suo
+
+# Build output
+bin/
+obj/
+
+# NuGet packages
+packages/
+
+# Logs
 *.log

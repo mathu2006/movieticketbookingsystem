@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using Microsoft.EntityFrameworkCore;
 using MovieTicketBooking.Data;
 using MovieTicketBooking.Models;
 using MovieTicketBooking.Repositories.Interfaces;
@@ -14,12 +15,22 @@ namespace MovieTicketBooking.Repositories
             _context = context;
         }
 
-        public async Task<List<Theatre>> GetAllAsync()
+        // GET PAGINATED THEATRES
+        public async Task<List<Theatre>> GetAllAsync(
+            int pageNumber, int pageSize)
         {
             return await _context.Theatres
                 .AsNoTracking()
                 .OrderBy(t => t.TheatreId)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+        }
+
+        // GET TOTAL THEATRE COUNT
+        public async Task<int> GetTotalCountAsync()
+        {
+            return await _context.Theatres.CountAsync();
         }
 
         public async Task<Theatre?> GetByIdAsync(int theatreId)

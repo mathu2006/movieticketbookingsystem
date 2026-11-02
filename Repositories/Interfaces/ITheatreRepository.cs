@@ -1,10 +1,13 @@
-﻿using MovieTicketBooking.Models;
+﻿
+using MovieTicketBooking.Models;
 
 namespace MovieTicketBooking.Repositories.Interfaces
 {
     public interface ITheatreRepository
     {
-        Task<List<Theatre>> GetAllAsync();
+        Task<List<Theatre>> GetAllAsync(int pageNumber, int pageSize);
+
+        Task<int> GetTotalCountAsync();
 
         Task<Theatre?> GetByIdAsync(int theatreId);
 

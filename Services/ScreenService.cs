@@ -1,4 +1,5 @@
-﻿using MovieTicketBooking.DTOs.Screens;
+﻿
+using MovieTicketBooking.DTOs.Screens;
 using MovieTicketBooking.Models;
 using MovieTicketBooking.Repositories.Interfaces;
 using MovieTicketBooking.Services.Interfaces;
@@ -14,17 +15,25 @@ namespace MovieTicketBooking.Services
             _screenRepository = screenRepository;
         }
 
-        // GET ALL SCREENS
-        public async Task<List<ScreenResponseDto>> GetAllAsync(int? theatreId)
+        // GET ALL SCREENS WITH PAGINATION
+        public async Task<ScreenPagedResponseDto> GetAllAsync(
+            int? theatreId, int pageNumber, int pageSize)
         {
-            if (theatreId.HasValue && theatreId.Value <= 0)
+            ValidatePagination(pageNumber, pageSize);
+
+            if (theatreId.HasValue)
             {
-                throw new ArgumentException("Theatre ID must be greater than zero.");
+                ValidateId(theatreId.Value, "Theatre");
             }
 
-            var screens = await _screenRepository.GetAllAsync(theatreId);
+            var screens = await _screenRepository.GetAllAsync(
+                theatreId, pageNumber, pageSize);
 
-            return screens.Select(MapToResponse).ToList();
+            var totalCount =
+                await _screenRepository.GetTotalCountAsync(theatreId);
+
+            return CreatePagedResponse(
+                screens, pageNumber, pageSize, totalCount);
         }
 
         // GET SCREEN BY ID
@@ -37,32 +46,43 @@ namespace MovieTicketBooking.Services
             return screen == null ? null : MapToResponse(screen);
         }
 
-        // GET SCREENS BY THEATRE ID
-        public async Task<List<ScreenResponseDto>> GetByTheatreIdAsync(int theatreId)
+        // GET SCREENS BY THEATRE ID WITH PAGINATION
+        public async Task<ScreenPagedResponseDto> GetByTheatreIdAsync(
+            int theatreId, int pageNumber, int pageSize)
         {
             ValidateId(theatreId, "Theatre");
+            ValidatePagination(pageNumber, pageSize);
 
             if (!await _screenRepository.TheatreExistsAsync(theatreId))
             {
                 throw new KeyNotFoundException("Theatre not found.");
             }
 
-            var screens = await _screenRepository.GetByTheatreIdAsync(theatreId);
+            var screens = await _screenRepository.GetByTheatreIdAsync(
+                theatreId, pageNumber, pageSize);
 
-            return screens.Select(MapToResponse).ToList();
+            var totalCount =
+                await _screenRepository.GetTotalCountByTheatreIdAsync(
+                    theatreId);
+
+            return CreatePagedResponse(
+                screens, pageNumber, pageSize, totalCount);
         }
 
         // CREATE SCREEN
-        public async Task<ScreenResponseDto> CreateAsync(CreateScreenRequestDto request)
+        public async Task<ScreenResponseDto> CreateAsync(
+            CreateScreenRequestDto request)
         {
             if (request == null)
             {
-                throw new ArgumentException("Screen details are required.");
+                throw new ArgumentException(
+                    "Screen details are required.");
             }
 
             ValidateScreen(request.TheatreId, request.ScreenName);
 
-            if (!await _screenRepository.TheatreExistsAsync(request.TheatreId))
+            if (!await _screenRepository.TheatreExistsAsync(
+                request.TheatreId))
             {
                 throw new KeyNotFoundException("Theatre not found.");
             }
@@ -87,12 +107,14 @@ namespace MovieTicketBooking.Services
 
             if (request == null)
             {
-                throw new ArgumentException("Screen details are required.");
+                throw new ArgumentException(
+                    "Screen details are required.");
             }
 
             ValidateScreen(request.TheatreId, request.ScreenName);
 
-            if (!await _screenRepository.TheatreExistsAsync(request.TheatreId))
+            if (!await _screenRepository.TheatreExistsAsync(
+                request.TheatreId))
             {
                 throw new KeyNotFoundException("Theatre not found.");
             }
@@ -129,6 +151,47 @@ namespace MovieTicketBooking.Services
             return true;
         }
 
+        // PAGINATION VALIDATION
+        private static void ValidatePagination(
+            int pageNumber, int pageSize)
+        {
+            if (pageNumber < 1)
+            {
+                throw new ArgumentException(
+                    "Page number must be greater than zero.");
+            }
+
+            if (pageSize < 1 || pageSize > 100)
+            {
+                throw new ArgumentException(
+                    "Page size must be between 1 and 100.");
+            }
+
+            if ((long)(pageNumber - 1) * pageSize > int.MaxValue)
+            {
+                throw new ArgumentException(
+                    "Page number is too large.");
+            }
+        }
+
+        // CREATE PAGINATED RESPONSE
+        private static ScreenPagedResponseDto CreatePagedResponse(
+            List<Screen> screens,
+            int pageNumber,
+            int pageSize,
+            int totalCount)
+        {
+            return new ScreenPagedResponseDto
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling(
+                    totalCount / (double)pageSize),
+                Data = screens.Select(MapToResponse).ToList()
+            };
+        }
+
         // ID VALIDATION
         private static void ValidateId(int id, string entityName)
         {
@@ -140,13 +203,15 @@ namespace MovieTicketBooking.Services
         }
 
         // SCREEN VALIDATION
-        private static void ValidateScreen(int theatreId, string screenName)
+        private static void ValidateScreen(
+            int theatreId, string screenName)
         {
             ValidateId(theatreId, "Theatre");
 
             if (string.IsNullOrWhiteSpace(screenName))
             {
-                throw new ArgumentException("Screen name is required.");
+                throw new ArgumentException(
+                    "Screen name is required.");
             }
 
             if (screenName.Trim().Length > 50)

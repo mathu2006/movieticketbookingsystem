@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Mvc;
 using MovieTicketBooking.DTOs.Screens;
 using MovieTicketBooking.Services.Interfaces;
 
@@ -15,13 +16,18 @@ namespace MovieTicketBooking.Controllers
             _screenService = screenService;
         }
 
-        // GET: api/screens?theatreId=1
+        // GET: api/screens?pageNumber=1&pageSize=10&theatreId=1
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] int? theatreId)
+        public async Task<IActionResult> GetAll(
+            [FromQuery] int? theatreId,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
         {
             try
             {
-                var screens = await _screenService.GetAllAsync(theatreId);
+                var screens = await _screenService.GetAllAsync(
+                    theatreId, pageNumber, pageSize);
+
                 return Ok(screens);
             }
             catch (ArgumentException ex)
@@ -40,7 +46,10 @@ namespace MovieTicketBooking.Controllers
 
                 if (screen == null)
                 {
-                    return NotFound(new { message = "Screen not found." });
+                    return NotFound(new
+                    {
+                        message = "Screen not found."
+                    });
                 }
 
                 return Ok(screen);
@@ -51,13 +60,18 @@ namespace MovieTicketBooking.Controllers
             }
         }
 
-        // GET: api/screens/theatre/1
+        // GET: api/screens/theatre/1?pageNumber=1&pageSize=10
         [HttpGet("theatre/{theatreId:int}")]
-        public async Task<IActionResult> GetByTheatreId(int theatreId)
+        public async Task<IActionResult> GetByTheatreId(
+            int theatreId,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
         {
             try
             {
-                var screens = await _screenService.GetByTheatreIdAsync(theatreId);
+                var screens = await _screenService.GetByTheatreIdAsync(
+                    theatreId, pageNumber, pageSize);
+
                 return Ok(screens);
             }
             catch (ArgumentException ex)
@@ -106,7 +120,10 @@ namespace MovieTicketBooking.Controllers
 
                 if (screen == null)
                 {
-                    return NotFound(new { message = "Screen not found." });
+                    return NotFound(new
+                    {
+                        message = "Screen not found."
+                    });
                 }
 
                 return Ok(screen);
@@ -131,7 +148,10 @@ namespace MovieTicketBooking.Controllers
 
                 if (!deleted)
                 {
-                    return NotFound(new { message = "Screen not found." });
+                    return NotFound(new
+                    {
+                        message = "Screen not found."
+                    });
                 }
 
                 return NoContent();

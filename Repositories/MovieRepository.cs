@@ -24,7 +24,7 @@ namespace MovieTicketBooking.Repositories
             if (!string.IsNullOrWhiteSpace(title))
             {
                 query = query.Where(movie =>
-                    movie.Title.Contains(title));
+                    movie.Title.Contains(title.Trim()));
             }
 
             return await query
@@ -32,6 +32,19 @@ namespace MovieTicketBooking.Repositories
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync();
+        }
+
+        public async Task<int> GetTotalCountAsync(string? title)
+        {
+            IQueryable<Movie> query = _context.Movies.AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(title))
+            {
+                query = query.Where(movie =>
+                    movie.Title.Contains(title.Trim()));
+            }
+
+            return await query.CountAsync();
         }
 
         public async Task<Movie?> GetByIdAsync(int movieId)

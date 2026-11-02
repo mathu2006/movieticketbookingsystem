@@ -1,4 +1,5 @@
-﻿using MovieTicketBooking.DTOs.Theatres;
+﻿
+using MovieTicketBooking.DTOs.Theatres;
 using MovieTicketBooking.Models;
 using MovieTicketBooking.Repositories.Interfaces;
 using MovieTicketBooking.Services.Interfaces;
@@ -14,12 +15,43 @@ namespace MovieTicketBooking.Services
             _theatreRepository = theatreRepository;
         }
 
-        // GET ALL THEATRES
-        public async Task<List<TheatreResponseDto>> GetAllAsync()
+        // GET ALL THEATRES WITH PAGINATION
+        public async Task<TheatrePagedResponseDto> GetAllAsync(
+            int pageNumber, int pageSize)
         {
-            var theatres = await _theatreRepository.GetAllAsync();
+            if (pageNumber < 1)
+            {
+                throw new ArgumentException(
+                    "Page number must be greater than zero.");
+            }
 
-            return theatres.Select(MapToResponse).ToList();
+            if (pageSize < 1 || pageSize > 100)
+            {
+                throw new ArgumentException(
+                    "Page size must be between 1 and 100.");
+            }
+
+            if ((long)(pageNumber - 1) * pageSize > int.MaxValue)
+            {
+                throw new ArgumentException(
+                    "Page number is too large.");
+            }
+
+            var theatres = await _theatreRepository.GetAllAsync(
+                pageNumber, pageSize);
+
+            var totalCount =
+                await _theatreRepository.GetTotalCountAsync();
+
+            return new TheatrePagedResponseDto
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling(
+                    totalCount / (double)pageSize),
+                Data = theatres.Select(MapToResponse).ToList()
+            };
         }
 
         // GET THEATRE BY ID
@@ -27,7 +59,8 @@ namespace MovieTicketBooking.Services
         {
             if (theatreId <= 0)
             {
-                throw new ArgumentException("Theatre ID must be greater than zero.");
+                throw new ArgumentException(
+                    "Theatre ID must be greater than zero.");
             }
 
             var theatre = await _theatreRepository.GetByIdAsync(theatreId);
@@ -39,6 +72,12 @@ namespace MovieTicketBooking.Services
         public async Task<TheatreResponseDto> CreateAsync(
             CreateTheatreRequestDto request)
         {
+            if (request == null)
+            {
+                throw new ArgumentException(
+                    "Theatre request cannot be null.");
+            }
+
             ValidateTheatre(request.Name, request.Location);
 
             var theatre = new Theatre
@@ -59,7 +98,14 @@ namespace MovieTicketBooking.Services
         {
             if (theatreId <= 0)
             {
-                throw new ArgumentException("Theatre ID must be greater than zero.");
+                throw new ArgumentException(
+                    "Theatre ID must be greater than zero.");
+            }
+
+            if (request == null)
+            {
+                throw new ArgumentException(
+                    "Theatre request cannot be null.");
             }
 
             ValidateTheatre(request.Name, request.Location);
@@ -84,7 +130,8 @@ namespace MovieTicketBooking.Services
         {
             if (theatreId <= 0)
             {
-                throw new ArgumentException("Theatre ID must be greater than zero.");
+                throw new ArgumentException(
+                    "Theatre ID must be greater than zero.");
             }
 
             var theatre = await _theatreRepository.GetByIdAsync(theatreId);
@@ -104,7 +151,8 @@ namespace MovieTicketBooking.Services
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw new ArgumentException("Theatre name is required.");
+                throw new ArgumentException(
+                    "Theatre name is required.");
             }
 
             if (name.Trim().Length > 150)
@@ -115,7 +163,8 @@ namespace MovieTicketBooking.Services
 
             if (string.IsNullOrWhiteSpace(location))
             {
-                throw new ArgumentException("Theatre location is required.");
+                throw new ArgumentException(
+                    "Theatre location is required.");
             }
 
             if (location.Trim().Length > 200)

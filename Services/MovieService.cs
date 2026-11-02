@@ -14,25 +14,42 @@ namespace MovieTicketBooking.Services
             _movieRepository = movieRepository;
         }
 
-        public async Task<List<MovieResponseDto>> GetAllAsync(
+        public async Task<MoviePagedResponseDto> GetAllAsync(
             int pageNumber,
             int pageSize,
             string? title)
         {
             if (pageNumber < 1)
-                throw new ArgumentException("Page number must be greater than zero.");
+                throw new ArgumentException(
+                    "Page number must be greater than zero.");
 
             if (pageSize < 1 || pageSize > 100)
-                throw new ArgumentException("Page size must be between 1 and 100.");
+                throw new ArgumentException(
+                    "Page size must be between 1 and 100.");
 
-            int skip = (pageNumber - 1) * pageSize;
+            long skipValue = (long)(pageNumber - 1) * pageSize;
+
+            if (skipValue > int.MaxValue)
+                throw new ArgumentException("Requested page is too large.");
+
+            int skip = (int)skipValue;
 
             List<Movie> movies = await _movieRepository.GetAllAsync(
                 skip,
                 pageSize,
                 title);
 
-            return movies.Select(MapToResponse).ToList();
+            int totalCount = await _movieRepository.GetTotalCountAsync(title);
+
+            return new MoviePagedResponseDto
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling(
+                    totalCount / (double)pageSize),
+                Data = movies.Select(MapToResponse).ToList()
+            };
         }
 
         public async Task<MovieResponseDto?> GetByIdAsync(int movieId)
@@ -124,22 +141,26 @@ namespace MovieTicketBooking.Services
                 throw new ArgumentException("Movie title is required.");
 
             if (title.Trim().Length > 150)
-                throw new ArgumentException("Movie title cannot exceed 150 characters.");
+                throw new ArgumentException(
+                    "Movie title cannot exceed 150 characters.");
 
             if (durationMinutes <= 0)
-                throw new ArgumentException("Movie duration must be greater than zero.");
+                throw new ArgumentException(
+                    "Movie duration must be greater than zero.");
 
             if (string.IsNullOrWhiteSpace(language))
                 throw new ArgumentException("Movie language is required.");
 
             if (language.Trim().Length > 50)
-                throw new ArgumentException("Movie language cannot exceed 50 characters.");
+                throw new ArgumentException(
+                    "Movie language cannot exceed 50 characters.");
 
             if (string.IsNullOrWhiteSpace(genre))
                 throw new ArgumentException("Movie genre is required.");
 
             if (genre.Trim().Length > 50)
-                throw new ArgumentException("Movie genre cannot exceed 50 characters.");
+                throw new ArgumentException(
+                    "Movie genre cannot exceed 50 characters.");
         }
 
         private static MovieResponseDto MapToResponse(Movie movie)

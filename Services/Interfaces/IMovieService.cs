@@ -4,7 +4,7 @@ namespace MovieTicketBooking.Services.Interfaces
 {
     public interface IMovieService
     {
-        Task<List<MovieResponseDto>> GetAllAsync(
+        Task<MoviePagedResponseDto> GetAllAsync(
             int pageNumber,
             int pageSize,
             string? title);

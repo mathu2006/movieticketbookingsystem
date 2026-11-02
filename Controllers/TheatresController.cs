@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Mvc;
 using MovieTicketBooking.DTOs.Theatres;
 using MovieTicketBooking.Services.Interfaces;
 
@@ -15,13 +16,23 @@ namespace MovieTicketBooking.Controllers
             _theatreService = theatreService;
         }
 
-        // GET: api/theatres
+        // GET: api/theatres?pageNumber=1&pageSize=10
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
         {
-            var theatres = await _theatreService.GetAllAsync();
+            try
+            {
+                var theatres = await _theatreService.GetAllAsync(
+                    pageNumber, pageSize);
 
-            return Ok(theatres);
+                return Ok(theatres);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         // GET: api/theatres/1

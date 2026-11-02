@@ -1,14 +1,21 @@
-﻿using MovieTicketBooking.Models;
+﻿
+using MovieTicketBooking.Models;
 
 namespace MovieTicketBooking.Repositories.Interfaces
 {
     public interface IScreenRepository
     {
-        Task<List<Screen>> GetAllAsync(int? theatreId);
+        Task<List<Screen>> GetAllAsync(
+            int? theatreId, int pageNumber, int pageSize);
+
+        Task<int> GetTotalCountAsync(int? theatreId);
 
         Task<Screen?> GetByIdAsync(int screenId);
 
-        Task<List<Screen>> GetByTheatreIdAsync(int theatreId);
+        Task<List<Screen>> GetByTheatreIdAsync(
+            int theatreId, int pageNumber, int pageSize);
+
+        Task<int> GetTotalCountByTheatreIdAsync(int theatreId);
 
         Task AddAsync(Screen screen);
 

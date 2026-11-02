@@ -1,16 +1,20 @@
-﻿using MovieTicketBooking.DTOs.Screens;
+﻿
+using MovieTicketBooking.DTOs.Screens;
 
 namespace MovieTicketBooking.Services.Interfaces
 {
     public interface IScreenService
     {
-        Task<List<ScreenResponseDto>> GetAllAsync(int? theatreId);
+        Task<ScreenPagedResponseDto> GetAllAsync(
+            int? theatreId, int pageNumber, int pageSize);
 
         Task<ScreenResponseDto?> GetByIdAsync(int screenId);
 
-        Task<List<ScreenResponseDto>> GetByTheatreIdAsync(int theatreId);
+        Task<ScreenPagedResponseDto> GetByTheatreIdAsync(
+            int theatreId, int pageNumber, int pageSize);
 
-        Task<ScreenResponseDto> CreateAsync(CreateScreenRequestDto request);
+        Task<ScreenResponseDto> CreateAsync(
+            CreateScreenRequestDto request);
 
         Task<ScreenResponseDto?> UpdateAsync(
             int screenId,
